@@ -14,9 +14,9 @@ return new class extends Migration
         Schema::create('shifts', function (Blueprint $table) {
             $table->id();
             $table->string('nom'); // Ex: Matin, Midi, Soir
-            $table->time('debut'); // Heure de début du shift
+            $table->time('debut'); // Heure de début du shift (sans valeur par défaut)
             $table->time('fin');   // Heure de fin du shift
-            $table->timestamps();  // created_at, updated_at
+            $table->timestamps();  // Ajoute les champs created_at et updated_at
         });
     }
 

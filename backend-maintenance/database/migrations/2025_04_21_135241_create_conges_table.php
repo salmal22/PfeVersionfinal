@@ -14,12 +14,16 @@ return new class extends Migration
         Schema::create('conges', function (Blueprint $table) {
             $table->id();
 
-            // Référence au technicien concerné
-            $table->foreignId('technicien_id')->constrained('users')->onDelete('cascade');
+            // Référence à l'utilisateur concerné
+            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
 
             // Plage de congé
             $table->date('date_debut');
             $table->date('date_fin');
+            
+            // Ajouté selon le contrôleur
+            $table->enum('type', ['maladie', 'vacances']);
+            $table->enum('statut', ['approuvé', 'en attente', 'refusé']);
 
             $table->timestamps();
         });
