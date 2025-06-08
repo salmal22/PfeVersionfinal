@@ -182,155 +182,116 @@ const ConducteurAnomalies = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-pink-50">
+    <div className="min-h-screen bg-gradient-to-br from-[#e0e7ff] via-[#fdf2f8] to-[#fef9c3] flex flex-col items-center justify-center py-8">
       {/* Header */}
-      <header className="bg-gradient-to-r from-white via-blue-50 to-indigo-100 shadow-lg border-b border-blue-200 sticky top-0 z-20">
-        <div className="px-6 py-4 max-w-7xl mx-auto">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <div className="bg-gradient-to-tr from-pink-200 via-red-300 to-red-500 p-3 rounded-2xl shadow-lg">
-                <AlertTriangle className="text-red-700" size={30} />
-              </div>
-              <div>
-                <h1 className="text-2xl font-extrabold text-indigo-900 tracking-tight drop-shadow-sm">Signaler une anomalie</h1>
-                <p className="text-sm text-blue-600 font-medium">Interface Conducteur – Port de Casablanca</p>
-              </div>
+      <header className="w-full bg-gradient-to-r from-white/80 via-blue-100/80 to-pink-100/80 shadow-xl border-b border-blue-200 sticky top-0 z-20 backdrop-blur-md">
+        <div className="px-8 py-6 max-w-5xl mx-auto flex items-center justify-between">
+          <div className="flex items-center space-x-4">
+            <div className="bg-gradient-to-tr from-pink-300 via-red-400 to-yellow-300 p-4 rounded-3xl shadow-2xl border border-white/60 backdrop-blur-md">
+              <AlertTriangle className="text-red-700 drop-shadow-lg" size={36} />
             </div>
-            <div className="flex items-center space-x-3">
-              <div className="flex items-center space-x-2 bg-gradient-to-r from-green-200 to-green-400 px-3 py-1 rounded-full shadow-md">
-                <div className="w-2 h-2 bg-green-600 rounded-full animate-pulse"></div>
-                <span className="text-green-900 text-sm font-bold">En ligne</span>
-              </div>
-              <button 
-                onClick={loadHistory}
-                className="p-2 text-indigo-500 hover:text-pink-600 hover:bg-pink-100 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-pink-300"
-                aria-label="Afficher l'historique"
-              >
-                <History size={24} />
-              </button>
+            <div>
+              <h1 className="text-3xl font-extrabold text-indigo-900 tracking-tight drop-shadow-md">Signaler une anomalie</h1>
+              <p className="text-base text-blue-600 font-medium">Interface Conducteur – Port de Casablanca</p>
             </div>
+          </div>
+          <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-2 bg-gradient-to-r from-green-200 to-green-400 px-4 py-2 rounded-full shadow-md border border-green-300">
+              <div className="w-2 h-2 bg-green-600 rounded-full animate-pulse"></div>
+              <span className="text-green-900 text-sm font-bold">En ligne</span>
+            </div>
+            <button 
+              onClick={loadHistory}
+              className="p-3 text-indigo-500 hover:text-pink-600 hover:bg-pink-100 rounded-xl transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-pink-300 shadow-md"
+              aria-label="Afficher l'historique"
+            >
+              <History size={28} />
+            </button>
           </div>
         </div>
       </header>
 
-      <div className="p-6 max-w-7xl mx-auto">
-        {/* Message de succès */}
-        {success && (
-          <div className="mb-6 bg-gradient-to-r from-green-200 via-green-100 to-green-50 border border-green-300 rounded-2xl p-4 shadow-xl transform transition-all duration-500 scale-100 animate-fade-in">
-            <div className="flex items-start space-x-3">
-              <CheckCircle className="text-green-600 mt-0.5" size={28} />
-              <div>
-                <h3 className="font-semibold text-green-900 mb-1 text-lg">
-                  ✅ Signalement envoyé avec succès !
-                </h3>
-                <p className="text-green-800 text-sm">
-                  Le responsable de maintenance a été notifié et traitera votre demande dans les plus brefs délais.
-                </p>
-              </div>
-            </div>
-          </div>
-        )}
-
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
+      <main className="w-full flex-1 flex flex-col items-center justify-center">
+        <div className="w-full max-w-5xl grid grid-cols-1 lg:grid-cols-3 gap-12 mt-10">
           {/* Formulaire principal */}
           <div className="lg:col-span-2">
-            <div className="bg-white bg-opacity-90 rounded-3xl shadow-2xl p-10 border border-blue-100">
-              <div className="flex items-center space-x-3 mb-8">
-                <AlertTriangle className="text-pink-500" size={32} />
-                <h2 className="text-xl font-extrabold text-indigo-900 tracking-tight">
-                  Signaler une nouvelle anomalie
-                </h2>
+            <div className="bg-white/70 backdrop-blur-xl rounded-3xl shadow-2xl p-12 border border-blue-100 relative overflow-hidden">
+              <div className="absolute -top-10 -right-10 w-40 h-40 bg-gradient-to-br from-pink-200 via-yellow-100 to-blue-100 rounded-full opacity-30 blur-2xl z-0"></div>
+              <div className="flex items-center space-x-4 mb-10 relative z-10">
+                <AlertTriangle className="text-pink-500" size={36} />
+                <h2 className="text-2xl font-extrabold text-indigo-900 tracking-tight">Signaler une nouvelle anomalie</h2>
               </div>
-
-              <form onSubmit={handleSubmit} className="space-y-10">
+              <form onSubmit={handleSubmit} className="space-y-10 relative z-10">
                 {/* Portique et Type */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                   <div>
-                    <label className="block text-sm font-bold text-blue-700 mb-2">
-                      Portique concerné <span className="text-pink-500">*</span>
-                    </label>
+                    <label className="block text-sm font-bold text-blue-700 mb-2">Portique concerné <span className="text-pink-500">*</span></label>
                     <select
                       name="portique"
                       value={form.portique}
                       onChange={handleChange}
                       required
-                      className="w-full px-4 py-3 border border-blue-200 rounded-xl focus:ring-2 focus:ring-pink-400 focus:border-transparent transition-all bg-blue-50 text-blue-900 font-semibold shadow-sm"
+                      className="w-full px-5 py-3 border border-blue-200 rounded-2xl focus:ring-2 focus:ring-pink-400 focus:border-transparent transition-all bg-blue-50/80 text-blue-900 font-semibold shadow-md hover:shadow-lg backdrop-blur-md"
                     >
                       <option value="">Sélectionner un portique</option>
                       {portiques.map(p => (
-                        <option key={p.id} value={p.id}>
-                          Portique {p.nom}
-                        </option>
+                        <option key={p.id} value={p.id}>Portique {p.nom}</option>
                       ))}
                     </select>
                   </div>
-
                   <div>
-                    <label className="block text-sm font-bold text-blue-700 mb-2">
-                      Type d'anomalie <span className="text-pink-500">*</span>
-                    </label>
+                    <label className="block text-sm font-bold text-blue-700 mb-2">Type d'anomalie <span className="text-pink-500">*</span></label>
                     <select
                       name="type"
                       value={form.type}
                       onChange={handleChange}
                       required
-                      className="w-full px-4 py-3 border border-blue-200 rounded-xl focus:ring-2 focus:ring-pink-400 focus:border-transparent transition-all bg-blue-50 text-blue-900 font-semibold shadow-sm"
+                      className="w-full px-5 py-3 border border-blue-200 rounded-2xl focus:ring-2 focus:ring-pink-400 focus:border-transparent transition-all bg-blue-50/80 text-blue-900 font-semibold shadow-md hover:shadow-lg backdrop-blur-md"
                     >
                       <option value="">Sélectionner le type</option>
                       {types.map(t => (
-                        <option key={t.id} value={t.id}>
-                          {t.label}
-                        </option>
+                        <option key={t.id} value={t.id}>{t.label}</option>
                       ))}
                     </select>
                   </div>
                 </div>
-
                 {/* Composant affecté */}
                 <div>
-                  <label className="block text-sm font-bold text-blue-700 mb-2">
-                    Composant affecté <span className="text-pink-500">*</span>
-                  </label>
+                  <label className="block text-sm font-bold text-blue-700 mb-2">Composant affecté <span className="text-pink-500">*</span></label>
                   <select
                     name="detail"
                     value={form.detail}
                     onChange={handleChange}
                     required
-                    className="w-full px-4 py-3 border border-blue-200 rounded-xl focus:ring-2 focus:ring-pink-400 focus:border-transparent transition-all bg-blue-50 text-blue-900 font-semibold shadow-sm"
+                    className="w-full px-5 py-3 border border-blue-200 rounded-2xl focus:ring-2 focus:ring-pink-400 focus:border-transparent transition-all bg-blue-50/80 text-blue-900 font-semibold shadow-md hover:shadow-lg backdrop-blur-md"
                   >
                     <option value="">Sélectionner le composant</option>
                     {details.map(d => (
-                      <option key={d} value={d}>
-                        {d.charAt(0).toUpperCase() + d.slice(1)}
-                      </option>
+                      <option key={d} value={d}>{d.charAt(0).toUpperCase() + d.slice(1)}</option>
                     ))}
                   </select>
                 </div>
-
                 {/* Description */}
                 <div>
-                  <label className="block text-sm font-bold text-blue-700 mb-2">
-                    Description détaillée du problème <span className="text-pink-500">*</span>
-                  </label>
+                  <label className="block text-sm font-bold text-blue-700 mb-2">Description détaillée du problème <span className="text-pink-500">*</span></label>
                   <textarea
                     name="description"
                     value={form.description}
                     onChange={handleChange}
                     required
                     rows={4}
-                    className="w-full px-4 py-3 border border-blue-200 rounded-xl focus:ring-2 focus:ring-pink-400 focus:border-transparent transition-all resize-none bg-blue-50 text-blue-900 font-semibold shadow-sm"
+                    className="w-full px-5 py-3 border border-blue-200 rounded-2xl focus:ring-2 focus:ring-pink-400 focus:border-transparent transition-all resize-none bg-blue-50/80 text-blue-900 font-semibold shadow-md hover:shadow-lg backdrop-blur-md placeholder:text-blue-400"
                     placeholder="Décrivez précisément le problème observé, les circonstances, les symptômes..."
                   />
                 </div>
-
                 {/* Boutons */}
                 <div className="flex space-x-4 pt-4">
                   <button
                     type="submit"
                     disabled={!isFormValid() || isSubmitting}
-                    className={`flex-1 flex items-center justify-center px-6 py-3 rounded-xl font-bold shadow-lg transition-all duration-200 text-lg tracking-wide focus:outline-none focus:ring-2 focus:ring-pink-400 focus:ring-offset-2
+                    className={`flex-1 flex items-center justify-center px-8 py-3 rounded-2xl font-bold shadow-xl transition-all duration-200 text-lg tracking-wide focus:outline-none focus:ring-2 focus:ring-pink-400 focus:ring-offset-2
                       ${isFormValid() && !isSubmitting
-                        ? 'bg-gradient-to-r from-pink-500 via-red-500 to-yellow-400 hover:from-pink-600 hover:to-yellow-500 text-white hover:shadow-2xl transform hover:-translate-y-0.5'
+                        ? 'bg-gradient-to-r from-pink-500 via-red-500 to-yellow-400 hover:from-pink-600 hover:to-yellow-500 text-white hover:shadow-2xl transform hover:-translate-y-0.5 scale-105'
                         : 'bg-gray-200 text-gray-400 cursor-not-allowed'}`}
                   >
                     {isSubmitting ? (
@@ -347,13 +308,24 @@ const ConducteurAnomalies = () => {
                   </button>
                 </div>
               </form>
+              {/* Message de succès */}
+              {success && (
+                <div className="absolute top-0 left-0 w-full h-full flex items-center justify-center bg-gradient-to-br from-green-200/80 via-green-100/80 to-green-50/80 border border-green-300 rounded-3xl p-6 shadow-2xl backdrop-blur-xl animate-fade-in z-20">
+                  <div className="flex items-start space-x-4">
+                    <CheckCircle className="text-green-600 mt-0.5" size={32} />
+                    <div>
+                      <h3 className="font-semibold text-green-900 mb-1 text-xl">✅ Signalement envoyé avec succès !</h3>
+                      <p className="text-green-800 text-base">Le responsable de maintenance a été notifié et traitera votre demande dans les plus brefs délais.</p>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
-
           {/* Panneau latéral */}
           <div className="space-y-10">
             {/* Informations utilisateur */}
-            <div className="bg-gradient-to-br from-blue-100 via-white to-indigo-100 rounded-3xl shadow-xl p-6 border border-blue-100">
+            <div className="bg-gradient-to-br from-blue-100/80 via-white/80 to-indigo-100/80 rounded-3xl shadow-xl p-8 border border-blue-100 backdrop-blur-md">
               <h3 className="text-lg font-bold mb-4 flex items-center text-blue-800">
                 <User className="mr-2 text-blue-500" size={24} />
                 Votre statut
@@ -380,9 +352,8 @@ const ConducteurAnomalies = () => {
                 </div>
               </div>
             </div>
-
             {/* Instructions */}
-            <div className="bg-gradient-to-br from-indigo-50 via-blue-100 to-pink-100 rounded-3xl p-6 border border-blue-100 shadow-lg">
+            <div className="bg-gradient-to-br from-indigo-50/80 via-blue-100/80 to-pink-100/80 rounded-3xl p-8 border border-blue-100 shadow-lg backdrop-blur-md">
               <h3 className="text-lg font-bold mb-4 text-pink-700 flex items-center">
                 <Info className="mr-2" size={24} />
                 Instructions importantes
@@ -390,27 +361,20 @@ const ConducteurAnomalies = () => {
               <div className="space-y-3 text-base text-blue-900">
                 <div className="flex items-start space-x-2">
                   <div className="w-6 h-6 bg-pink-500 text-white rounded-full flex items-center justify-center text-xs font-bold mt-0.5">1</div>
-                  <div>
-                    <strong>Sécurité d'abord :</strong> En cas d'urgence critique, arrêtez immédiatement l'opération
-                  </div>
+                  <div><strong>Sécurité d'abord :</strong> En cas d'urgence critique, arrêtez immédiatement l'opération</div>
                 </div>
                 <div className="flex items-start space-x-2">
                   <div className="w-6 h-6 bg-pink-500 text-white rounded-full flex items-center justify-center text-xs font-bold mt-0.5">2</div>
-                  <div>
-                    <strong>Description précise :</strong> Plus vous donnez de détails, plus l'intervention sera efficace
-                  </div>
+                  <div><strong>Description précise :</strong> Plus vous donnez de détails, plus l'intervention sera efficace</div>
                 </div>
                 <div className="flex items-start space-x-2">
                   <div className="w-6 h-6 bg-pink-500 text-white rounded-full flex items-center justify-center text-xs font-bold mt-0.5">3</div>
-                  <div>
-                    <strong>Suivi en temps réel :</strong> Vous serez notifié des actions entreprises
-                  </div>
+                  <div><strong>Suivi en temps réel :</strong> Vous serez notifié des actions entreprises</div>
                 </div>
               </div>
             </div>
-
             {/* Contacts d'urgence */}
-            <div className="bg-gradient-to-br from-pink-100 via-red-100 to-orange-100 border border-pink-200 rounded-3xl p-6 shadow-lg">
+            <div className="bg-gradient-to-br from-pink-100/80 via-red-100/80 to-orange-100/80 border border-pink-200 rounded-3xl p-8 shadow-lg backdrop-blur-md">
               <h3 className="text-lg font-bold mb-4 text-pink-900 flex items-center">
                 <Phone className="mr-2" size={24} />
                 Contacts d'urgence
@@ -430,10 +394,9 @@ const ConducteurAnomalies = () => {
                 </div>
               </div>
             </div>
-
             {/* Historique */}
             {showHistory && (
-              <div className="bg-white bg-opacity-90 rounded-3xl shadow-xl p-6 border border-blue-100 animate-fade-in">
+              <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-xl p-8 border border-blue-100 animate-fade-in">
                 <h3 className="text-lg font-bold mb-4 flex items-center text-indigo-700">
                   <Clock className="mr-2 text-pink-500" size={24} />
                   Historique récent
@@ -443,10 +406,10 @@ const ConducteurAnomalies = () => {
                     <p className="text-blue-400 text-base">Aucun signalement récent</p>
                   ) : (
                     history.slice(0, 5).map((item) => (
-                      <div key={item.id} className="border border-pink-100 rounded-xl p-3 bg-gradient-to-r from-blue-50 via-white to-pink-50 hover:bg-pink-50 transition-colors duration-200 shadow-sm">
+                      <div key={item.id} className="border border-pink-100 rounded-xl p-4 bg-gradient-to-r from-blue-50/80 via-white/80 to-pink-50/80 hover:bg-pink-50/80 transition-colors duration-200 shadow-md">
                         <div className="flex items-center justify-between mb-1">
-                          <span className="font-bold text-sm text-indigo-900">{item.title}</span>
-                          <span className={`px-2 py-1 rounded text-xs font-extrabold uppercase tracking-wide shadow-md
+                          <span className="font-bold text-base text-indigo-900">{item.title}</span>
+                          <span className={`px-3 py-1 rounded-xl text-xs font-extrabold uppercase tracking-wide shadow-md
                             ${item.statut === 'en attente' ? 'bg-yellow-200 text-yellow-900' :
                               item.statut === 'en cours' ? 'bg-blue-200 text-blue-900' :
                               'bg-green-200 text-green-900'}`}
@@ -454,9 +417,7 @@ const ConducteurAnomalies = () => {
                             {item.statut}
                           </span>
                         </div>
-                        <p className="text-xs text-blue-400">
-                          {new Date(item.date_debut).toLocaleDateString('fr-FR')}
-                        </p>
+                        <p className="text-xs text-blue-400">{new Date(item.date_debut).toLocaleDateString('fr-FR')}</p>
                       </div>
                     ))
                   )}
@@ -465,19 +426,14 @@ const ConducteurAnomalies = () => {
             )}
           </div>
         </div>
-
         {/* Footer */}
-        <div className="mt-12 text-center">
-          <div className="bg-gradient-to-r from-blue-100 via-white to-pink-100 rounded-2xl shadow-lg p-4 border border-blue-100">
-            <p className="text-indigo-700 text-base font-bold">
-              🏗️ Port de Casablanca - Système de Maintenance Intégré v2.0
-            </p>
-            <p className="text-pink-500 text-xs mt-1">
-              Pour toute assistance technique, contactez le support : <span className="underline">support@port-casa.ma</span>
-            </p>
+        <div className="mt-16 w-full flex justify-center">
+          <div className="bg-gradient-to-r from-blue-100/80 via-white/80 to-pink-100/80 rounded-2xl shadow-lg p-6 border border-blue-100 max-w-2xl w-full text-center backdrop-blur-md">
+            <p className="text-indigo-700 text-lg font-bold">🏗️ Port de Casablanca - Système de Maintenance Intégré v2.0</p>
+            <p className="text-pink-500 text-sm mt-1">Pour toute assistance technique, contactez le support : <span className="underline">support@port-casa.ma</span></p>
           </div>
         </div>
-      </div>
+      </main>
     </div>
   );
 };
