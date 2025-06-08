@@ -21,6 +21,22 @@ const mockUsers = [
     email: 'technicien@marsamaroc.ma',
     password: 'password123',
     role: 'technicien',
+    name: 'Karime Technicien',
+    department: 'Maintenance'
+  },
+  {
+    id: 4,
+    email: 'technicien1@marsamaroc.ma',
+    password: 'password123',
+    role: 'technicien',
+    name: 'Karimo Technicien',
+    department: 'Maintenance'
+  },
+  {
+    id: 5,
+    email: 'technicien5@marsamaroc.ma',
+    password: 'password123',
+    role: 'technicien',
     name: 'Karim Technicien',
     department: 'Maintenance'
   }
@@ -73,6 +89,22 @@ const mockTechniciens = [
     speciality: 'Mécanique',
     status: 'disponible',
     currentInterventions: 1
+  },
+  {
+    id: 4,
+    email: 'technicien1@marsamaroc.ma',
+    password: 'password123',
+    role: 'technicien',
+    name: 'ahmed Technicien',
+    department: 'Maintenance'
+  },
+  {
+    id: 5,
+    email: 'technicien5@marsamaroc.ma',
+    password: 'password123',
+    role: 'technicien',
+    name: 'hamza Technicien',
+    department: 'Maintenance'
   }
 ];
 

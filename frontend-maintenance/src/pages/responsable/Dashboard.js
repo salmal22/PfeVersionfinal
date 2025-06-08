@@ -2000,19 +2000,7 @@ const ResponsableDashboard = () => {
               )}
             </div>
             
-            <div style={{
-              height: '32px',
-              width: '32px',
-              backgroundColor: '#3b82f6',
-              borderRadius: '50%',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              color: 'white',
-              fontWeight: '500'
-            }}>
-              R
-            </div>
+          
           </div>
         </div>
       </header>
