@@ -16,7 +16,7 @@ import {
   User
 } from 'lucide-react';
 
-// Service de données (même que précédemment)
+// Service de données
 class DataService {
   constructor() {
     this.ANOMALIES_KEY = 'maintenance_anomalies';
@@ -107,6 +107,420 @@ const ConducteurAnomalies = () => {
   const [showHistory, setShowHistory] = useState(false);
   const [history, setHistory] = useState([]);
 
+  // Styles CSS
+  const styles = {
+    container: {
+      minHeight: '100vh',
+      background: 'linear-gradient(135deg, #e0e7ff 0%, #fdf2f8 50%, #fef9c3 100%)',
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: '2rem 0',
+      fontFamily: 'system-ui, -apple-system, sans-serif'
+    },
+    header: {
+      width: '100%',
+      background: 'linear-gradient(90deg, rgba(255,255,255,0.8) 0%, rgba(219,234,254,0.8) 50%, rgba(252,231,243,0.8) 100%)',
+      boxShadow: '0 10px 25px rgba(0,0,0,0.1)',
+      borderBottom: '1px solid #bfdbfe',
+      position: 'sticky',
+      top: 0,
+      zIndex: 20,
+      backdropFilter: 'blur(12px)'
+    },
+    headerContent: {
+      padding: '1.5rem 2rem',
+      maxWidth: '80rem',
+      margin: '0 auto',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'space-between'
+    },
+    headerLeft: {
+      display: 'flex',
+      alignItems: 'center',
+      gap: '1rem'
+    },
+    headerIcon: {
+      background: 'linear-gradient(135deg, #fbb6ce, #ef4444, #fbbf24)',
+      padding: '1rem',
+      borderRadius: '1.5rem',
+      boxShadow: '0 8px 32px rgba(0,0,0,0.2)',
+      border: '1px solid rgba(255,255,255,0.6)',
+      backdropFilter: 'blur(12px)'
+    },
+    headerTitle: {
+      fontSize: '1.875rem',
+      fontWeight: '800',
+      color: '#312e81',
+      letterSpacing: '-0.025em',
+      filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.1))'
+    },
+    headerSubtitle: {
+      fontSize: '1rem',
+      color: '#2563eb',
+      fontWeight: '500'
+    },
+    headerRight: {
+      display: 'flex',
+      alignItems: 'center',
+      gap: '1rem'
+    },
+    statusBadge: {
+      display: 'flex',
+      alignItems: 'center',
+      gap: '0.5rem',
+      background: 'linear-gradient(90deg, #dcfce7, #86efac)',
+      padding: '0.5rem 1rem',
+      borderRadius: '9999px',
+      boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
+      border: '1px solid #bbf7d0'
+    },
+    statusDot: {
+      width: '8px',
+      height: '8px',
+      backgroundColor: '#16a34a',
+      borderRadius: '50%',
+      animation: 'pulse 2s infinite'
+    },
+    historyButton: {
+      padding: '0.75rem',
+      color: '#6366f1',
+      backgroundColor: 'transparent',
+      border: 'none',
+      borderRadius: '0.75rem',
+      cursor: 'pointer',
+      transition: 'all 0.2s',
+      boxShadow: '0 4px 6px rgba(0,0,0,0.1)'
+    },
+    main: {
+      width: '100%',
+      flex: 1,
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      justifyContent: 'center'
+    },
+    mainGrid: {
+      width: '100%',
+      maxWidth: '80rem',
+      display: 'grid',
+      gridTemplateColumns: '2fr 1fr',
+      gap: '3rem',
+      marginTop: '2.5rem',
+      padding: '0 2rem'
+    },
+    formCard: {
+      background: 'rgba(255,255,255,0.7)',
+      backdropFilter: 'blur(20px)',
+      borderRadius: '1.5rem',
+      boxShadow: '0 25px 50px rgba(0,0,0,0.1)',
+      padding: '3rem',
+      border: '1px solid #ddd6fe',
+      position: 'relative',
+      overflow: 'hidden'
+    },
+    formDecoration: {
+      position: 'absolute',
+      top: '-2.5rem',
+      right: '-2.5rem',
+      width: '10rem',
+      height: '10rem',
+      background: 'linear-gradient(135deg, #fbb6ce, #fef3c7, #ddd6fe)',
+      borderRadius: '50%',
+      opacity: 0.3,
+      filter: 'blur(40px)',
+      zIndex: 0
+    },
+    formHeader: {
+      display: 'flex',
+      alignItems: 'center',
+      gap: '1rem',
+      marginBottom: '2.5rem',
+      position: 'relative',
+      zIndex: 10
+    },
+    formTitle: {
+      fontSize: '1.5rem',
+      fontWeight: '800',
+      color: '#312e81',
+      letterSpacing: '-0.025em'
+    },
+    formContent: {
+      position: 'relative',
+      zIndex: 10
+    },
+    formGrid: {
+      display: 'grid',
+      gridTemplateColumns: '1fr 1fr',
+      gap: '2rem',
+      marginBottom: '2.5rem'
+    },
+    formGroup: {
+      display: 'flex',
+      flexDirection: 'column'
+    },
+    formGroupFull: {
+      display: 'flex',
+      flexDirection: 'column',
+      marginBottom: '2.5rem'
+    },
+    label: {
+      display: 'block',
+      fontSize: '0.875rem',
+      fontWeight: '700',
+      color: '#1e40af',
+      marginBottom: '0.5rem'
+    },
+    required: {
+      color: '#ec4899'
+    },
+    select: {
+      width: '100%',
+      padding: '0.75rem 1.25rem',
+      border: '1px solid #bfdbfe',
+      borderRadius: '1rem',
+      fontSize: '0.875rem',
+      fontWeight: '600',
+      color: '#1e3a8a',
+      background: 'rgba(239,246,255,0.8)',
+      backdropFilter: 'blur(12px)',
+      boxShadow: '0 4px 6px rgba(0,0,0,0.05)',
+      transition: 'all 0.2s',
+      outline: 'none'
+    },
+    textarea: {
+      width: '100%',
+      padding: '0.75rem 1.25rem',
+      border: '1px solid #bfdbfe',
+      borderRadius: '1rem',
+      fontSize: '0.875rem',
+      fontWeight: '600',
+      color: '#1e3a8a',
+      background: 'rgba(239,246,255,0.8)',
+      backdropFilter: 'blur(12px)',
+      boxShadow: '0 4px 6px rgba(0,0,0,0.05)',
+      transition: 'all 0.2s',
+      resize: 'none',
+      outline: 'none'
+    },
+    submitButton: {
+      width: '100%',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: '0.75rem 2rem',
+      borderRadius: '1rem',
+      fontSize: '1.125rem',
+      fontWeight: '700',
+      letterSpacing: '0.025em',
+      boxShadow: '0 10px 25px rgba(0,0,0,0.2)',
+      transition: 'all 0.2s',
+      border: 'none',
+      cursor: 'pointer'
+    },
+    submitButtonActive: {
+      background: 'linear-gradient(90deg, #ec4899, #ef4444, #f59e0b)',
+      color: 'white'
+    },
+    submitButtonDisabled: {
+      backgroundColor: '#e5e7eb',
+      color: '#9ca3af',
+      cursor: 'not-allowed'
+    },
+    successOverlay: {
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      width: '100%',
+      height: '100%',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      background: 'linear-gradient(135deg, rgba(187,247,208,0.8), rgba(220,252,231,0.8), rgba(240,253,244,0.8))',
+      border: '1px solid #86efac',
+      borderRadius: '1.5rem',
+      padding: '1.5rem',
+      boxShadow: '0 25px 50px rgba(0,0,0,0.1)',
+      backdropFilter: 'blur(20px)',
+      zIndex: 20
+    },
+    successContent: {
+      display: 'flex',
+      alignItems: 'flex-start',
+      gap: '1rem'
+    },
+    successTitle: {
+      fontWeight: '600',
+      color: '#14532d',
+      marginBottom: '0.25rem',
+      fontSize: '1.25rem'
+    },
+    successText: {
+      color: '#166534',
+      fontSize: '1rem'
+    },
+    sidebar: {
+      display: 'flex',
+      flexDirection: 'column',
+      gap: '2.5rem'
+    },
+    sidebarCard: {
+      borderRadius: '1.5rem',
+      boxShadow: '0 10px 25px rgba(0,0,0,0.1)',
+      padding: '2rem',
+      border: '1px solid #ddd6fe',
+      backdropFilter: 'blur(12px)'
+    },
+    userCard: {
+      background: 'linear-gradient(135deg, rgba(219,234,254,0.8), rgba(255,255,255,0.8), rgba(224,231,255,0.8))'
+    },
+    instructionsCard: {
+      background: 'linear-gradient(135deg, rgba(238,242,255,0.8), rgba(219,234,254,0.8), rgba(252,231,243,0.8))'
+    },
+    contactsCard: {
+      background: 'linear-gradient(135deg, rgba(252,231,243,0.8), rgba(254,202,202,0.8), rgba(255,237,213,0.8))',
+      border: '1px solid #fbcfe8'
+    },
+    historyCard: {
+      background: 'rgba(255,255,255,0.8)',
+      backdropFilter: 'blur(20px)'
+    },
+    cardTitle: {
+      fontSize: '1.125rem',
+      fontWeight: '700',
+      marginBottom: '1rem',
+      display: 'flex',
+      alignItems: 'center',
+      gap: '0.5rem'
+    },
+    userInfo: {
+      display: 'flex',
+      flexDirection: 'column',
+      gap: '0.75rem',
+      fontSize: '1rem'
+    },
+    userInfoRow: {
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'space-between'
+    },
+    instructions: {
+      display: 'flex',
+      flexDirection: 'column',
+      gap: '0.75rem',
+      fontSize: '1rem',
+      color: '#1e3a8a'
+    },
+    instructionItem: {
+      display: 'flex',
+      alignItems: 'flex-start',
+      gap: '0.5rem'
+    },
+    instructionNumber: {
+      width: '1.5rem',
+      height: '1.5rem',
+      backgroundColor: '#ec4899',
+      color: 'white',
+      borderRadius: '50%',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      fontSize: '0.75rem',
+      fontWeight: '700',
+      marginTop: '0.125rem',
+      flexShrink: 0
+    },
+    contacts: {
+      display: 'flex',
+      flexDirection: 'column',
+      gap: '0.5rem',
+      fontSize: '1rem'
+    },
+    contactRow: {
+      display: 'flex',
+      justifyContent: 'space-between'
+    },
+    historyList: {
+      maxHeight: '16rem',
+      overflowY: 'auto',
+      display: 'flex',
+      flexDirection: 'column',
+      gap: '0.75rem'
+    },
+    historyItem: {
+      border: '1px solid #fbcfe8',
+      borderRadius: '0.75rem',
+      padding: '1rem',
+      background: 'linear-gradient(90deg, rgba(239,246,255,0.8), rgba(255,255,255,0.8), rgba(252,231,243,0.8))',
+      transition: 'all 0.2s',
+      boxShadow: '0 4px 6px rgba(0,0,0,0.05)',
+      cursor: 'pointer'
+    },
+    historyHeader: {
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      marginBottom: '0.25rem'
+    },
+    historyTitle: {
+      fontWeight: '700',
+      fontSize: '1rem',
+      color: '#312e81'
+    },
+    historyStatus: {
+      padding: '0.25rem 0.75rem',
+      borderRadius: '0.75rem',
+      fontSize: '0.75rem',
+      fontWeight: '800',
+      textTransform: 'uppercase',
+      letterSpacing: '0.05em',
+      boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+    },
+    historyDate: {
+      fontSize: '0.75rem',
+      color: '#93c5fd'
+    },
+    footer: {
+      marginTop: '4rem',
+      width: '100%',
+      display: 'flex',
+      justifyContent: 'center',
+      padding: '0 2rem'
+    },
+    footerCard: {
+      background: 'linear-gradient(90deg, rgba(219,234,254,0.8), rgba(255,255,255,0.8), rgba(252,231,243,0.8))',
+      borderRadius: '1rem',
+      boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+      padding: '1.5rem',
+      border: '1px solid #ddd6fe',
+      maxWidth: '32rem',
+      width: '100%',
+      textAlign: 'center',
+      backdropFilter: 'blur(12px)'
+    },
+    footerTitle: {
+      color: '#3730a3',
+      fontSize: '1.125rem',
+      fontWeight: '700'
+    },
+    footerSubtitle: {
+      color: '#ec4899',
+      fontSize: '0.875rem',
+      marginTop: '0.25rem'
+    },
+    spinner: {
+      width: '1.25rem',
+      height: '1.25rem',
+      border: '2px solid transparent',
+      borderTop: '2px solid white',
+      borderRadius: '50%',
+      animation: 'spin 1s linear infinite',
+      marginRight: '0.5rem'
+    }
+  };
+
   // Données statiques
   const portiques = [
     { id: 1, nom: 'P5' },
@@ -167,42 +581,70 @@ const ConducteurAnomalies = () => {
     setShowHistory(!showHistory);
   };
 
-  const getTypeIcon = (type) => {
-    const typeObj = types.find(t => t.id === type);
-    return typeObj ? typeObj.icon : Wrench;
-  };
-
-  const getTypeColor = (type) => {
-    const typeObj = types.find(t => t.id === type);
-    return typeObj ? typeObj.color : 'gray';
-  };
-
   const isFormValid = () => {
     return form.portique && form.type && form.detail && form.description.trim();
   };
 
+  const getStatusStyle = (status) => {
+    switch (status) {
+      case 'en attente':
+        return { backgroundColor: '#fef3c7', color: '#92400e' };
+      case 'en cours':
+        return { backgroundColor: '#dbeafe', color: '#1e40af' };
+      default:
+        return { backgroundColor: '#dcfce7', color: '#166534' };
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#e0e7ff] via-[#fdf2f8] to-[#fef9c3] flex flex-col items-center justify-center py-8">
+    <div style={styles.container}>
+      {/* Keyframes CSS pour les animations */}
+      <style>{`
+        @keyframes pulse {
+          0%, 100% { opacity: 1; }
+          50% { opacity: 0.5; }
+        }
+        @keyframes spin {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
+        }
+        @keyframes fade-in {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+        .animate-fade-in {
+          animation: fade-in 0.3s ease-in-out;
+        }
+      `}</style>
+
       {/* Header */}
-      <header className="w-full bg-gradient-to-r from-white/80 via-blue-100/80 to-pink-100/80 shadow-xl border-b border-blue-200 sticky top-0 z-20 backdrop-blur-md">
-        <div className="px-8 py-6 max-w-5xl mx-auto flex items-center justify-between">
-          <div className="flex items-center space-x-4">
-            <div className="bg-gradient-to-tr from-pink-300 via-red-400 to-yellow-300 p-4 rounded-3xl shadow-2xl border border-white/60 backdrop-blur-md">
-              <AlertTriangle className="text-red-700 drop-shadow-lg" size={36} />
+      <header style={styles.header}>
+        <div style={styles.headerContent}>
+          <div style={styles.headerLeft}>
+            <div style={styles.headerIcon}>
+              <AlertTriangle style={{ color: '#b91c1c', filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.2))' }} size={36} />
             </div>
             <div>
-              <h1 className="text-3xl font-extrabold text-indigo-900 tracking-tight drop-shadow-md">Signaler une anomalie</h1>
-              <p className="text-base text-blue-600 font-medium">Interface Conducteur – Port de Casablanca</p>
+              <h1 style={styles.headerTitle}>Signaler une anomalie</h1>
+              <p style={styles.headerSubtitle}>Interface Conducteur – Port de Casablanca</p>
             </div>
           </div>
-          <div className="flex items-center space-x-4">
-            <div className="flex items-center space-x-2 bg-gradient-to-r from-green-200 to-green-400 px-4 py-2 rounded-full shadow-md border border-green-300">
-              <div className="w-2 h-2 bg-green-600 rounded-full animate-pulse"></div>
-              <span className="text-green-900 text-sm font-bold">En ligne</span>
+          <div style={styles.headerRight}>
+            <div style={styles.statusBadge}>
+              <div style={styles.statusDot}></div>
+              <span style={{ color: '#14532d', fontSize: '0.875rem', fontWeight: '700' }}>En ligne</span>
             </div>
             <button 
               onClick={loadHistory}
-              className="p-3 text-indigo-500 hover:text-pink-600 hover:bg-pink-100 rounded-xl transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-pink-300 shadow-md"
+              style={styles.historyButton}
+              onMouseOver={(e) => {
+                e.currentTarget.style.color = '#ec4899';
+                e.currentTarget.style.backgroundColor = '#fdf2f8';
+              }}
+              onMouseOut={(e) => {
+                e.currentTarget.style.color = '#6366f1';
+                e.currentTarget.style.backgroundColor = 'transparent';
+              }}
               aria-label="Afficher l'historique"
             >
               <History size={28} />
@@ -211,27 +653,38 @@ const ConducteurAnomalies = () => {
         </div>
       </header>
 
-      <main className="w-full flex-1 flex flex-col items-center justify-center">
-        <div className="w-full max-w-5xl grid grid-cols-1 lg:grid-cols-3 gap-12 mt-10">
+      <main style={styles.main}>
+        <div style={styles.mainGrid}>
           {/* Formulaire principal */}
-          <div className="lg:col-span-2">
-            <div className="bg-white/70 backdrop-blur-xl rounded-3xl shadow-2xl p-12 border border-blue-100 relative overflow-hidden">
-              <div className="absolute -top-10 -right-10 w-40 h-40 bg-gradient-to-br from-pink-200 via-yellow-100 to-blue-100 rounded-full opacity-30 blur-2xl z-0"></div>
-              <div className="flex items-center space-x-4 mb-10 relative z-10">
-                <AlertTriangle className="text-pink-500" size={36} />
-                <h2 className="text-2xl font-extrabold text-indigo-900 tracking-tight">Signaler une nouvelle anomalie</h2>
+          <div>
+            <div style={styles.formCard}>
+              <div style={styles.formDecoration}></div>
+              <div style={styles.formHeader}>
+                <AlertTriangle style={{ color: '#ec4899' }} size={36} />
+                <h2 style={styles.formTitle}>Signaler une nouvelle anomalie</h2>
               </div>
-              <form onSubmit={handleSubmit} className="space-y-10 relative z-10">
-                {/* Portique et Type */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                  <div>
-                    <label className="block text-sm font-bold text-blue-700 mb-2">Portique concerné <span className="text-pink-500">*</span></label>
+              <div style={styles.formContent}>
+                <div style={styles.formGrid}>
+                  <div style={styles.formGroup}>
+                    <label style={styles.label}>
+                      Portique concerné <span style={styles.required}>*</span>
+                    </label>
                     <select
                       name="portique"
                       value={form.portique}
                       onChange={handleChange}
                       required
-                      className="w-full px-5 py-3 border border-blue-200 rounded-2xl focus:ring-2 focus:ring-pink-400 focus:border-transparent transition-all bg-blue-50/80 text-blue-900 font-semibold shadow-md hover:shadow-lg backdrop-blur-md"
+                      style={styles.select}
+                      onFocus={(e) => {
+                        e.currentTarget.style.outline = '2px solid #f472b6';
+                        e.currentTarget.style.borderColor = 'transparent';
+                      }}
+                      onBlur={(e) => {
+                        e.currentTarget.style.outline = 'none';
+                        e.currentTarget.style.borderColor = '#bfdbfe';
+                      }}
+                      onMouseOver={(e) => e.currentTarget.style.boxShadow = '0 8px 15px rgba(0,0,0,0.1)'}
+                      onMouseOut={(e) => e.currentTarget.style.boxShadow = '0 4px 6px rgba(0,0,0,0.05)'}
                     >
                       <option value="">Sélectionner un portique</option>
                       {portiques.map(p => (
@@ -239,14 +692,26 @@ const ConducteurAnomalies = () => {
                       ))}
                     </select>
                   </div>
-                  <div>
-                    <label className="block text-sm font-bold text-blue-700 mb-2">Type d'anomalie <span className="text-pink-500">*</span></label>
+                  <div style={styles.formGroup}>
+                    <label style={styles.label}>
+                      Type d'anomalie <span style={styles.required}>*</span>
+                    </label>
                     <select
                       name="type"
                       value={form.type}
                       onChange={handleChange}
                       required
-                      className="w-full px-5 py-3 border border-blue-200 rounded-2xl focus:ring-2 focus:ring-pink-400 focus:border-transparent transition-all bg-blue-50/80 text-blue-900 font-semibold shadow-md hover:shadow-lg backdrop-blur-md"
+                      style={styles.select}
+                      onFocus={(e) => {
+                        e.currentTarget.style.outline = '2px solid #f472b6';
+                        e.currentTarget.style.borderColor = 'transparent';
+                      }}
+                      onBlur={(e) => {
+                        e.currentTarget.style.outline = 'none';
+                        e.currentTarget.style.borderColor = '#bfdbfe';
+                      }}
+                      onMouseOver={(e) => e.currentTarget.style.boxShadow = '0 8px 15px rgba(0,0,0,0.1)'}
+                      onMouseOut={(e) => e.currentTarget.style.boxShadow = '0 4px 6px rgba(0,0,0,0.05)'}
                     >
                       <option value="">Sélectionner le type</option>
                       {types.map(t => (
@@ -255,15 +720,26 @@ const ConducteurAnomalies = () => {
                     </select>
                   </div>
                 </div>
-                {/* Composant affecté */}
-                <div>
-                  <label className="block text-sm font-bold text-blue-700 mb-2">Composant affecté <span className="text-pink-500">*</span></label>
+                <div style={styles.formGroupFull}>
+                  <label style={styles.label}>
+                    Composant affecté <span style={styles.required}>*</span>
+                  </label>
                   <select
                     name="detail"
                     value={form.detail}
                     onChange={handleChange}
                     required
-                    className="w-full px-5 py-3 border border-blue-200 rounded-2xl focus:ring-2 focus:ring-pink-400 focus:border-transparent transition-all bg-blue-50/80 text-blue-900 font-semibold shadow-md hover:shadow-lg backdrop-blur-md"
+                    style={styles.select}
+                    onFocus={(e) => {
+                      e.currentTarget.style.outline = '2px solid #f472b6';
+                      e.currentTarget.style.borderColor = 'transparent';
+                    }}
+                    onBlur={(e) => {
+                      e.currentTarget.style.outline = 'none';
+                      e.currentTarget.style.borderColor = '#bfdbfe';
+                    }}
+                    onMouseOver={(e) => e.currentTarget.style.boxShadow = '0 8px 15px rgba(0,0,0,0.1)'}
+                    onMouseOut={(e) => e.currentTarget.style.boxShadow = '0 4px 6px rgba(0,0,0,0.05)'}
                   >
                     <option value="">Sélectionner le composant</option>
                     {details.map(d => (
@@ -271,153 +747,186 @@ const ConducteurAnomalies = () => {
                     ))}
                   </select>
                 </div>
-                {/* Description */}
-                <div>
-                  <label className="block text-sm font-bold text-blue-700 mb-2">Description détaillée du problème <span className="text-pink-500">*</span></label>
+                <div style={styles.formGroupFull}>
+                  <label style={styles.label}>
+                    Description détaillée du problème <span style={styles.required}>*</span>
+                  </label>
                   <textarea
                     name="description"
                     value={form.description}
                     onChange={handleChange}
                     required
                     rows={4}
-                    className="w-full px-5 py-3 border border-blue-200 rounded-2xl focus:ring-2 focus:ring-pink-400 focus:border-transparent transition-all resize-none bg-blue-50/80 text-blue-900 font-semibold shadow-md hover:shadow-lg backdrop-blur-md placeholder:text-blue-400"
+                    style={styles.textarea}
                     placeholder="Décrivez précisément le problème observé, les circonstances, les symptômes..."
+                    onFocus={(e) => {
+                      e.currentTarget.style.outline = '2px solid #f472b6';
+                      e.currentTarget.style.borderColor = 'transparent';
+                    }}
+                    onBlur={(e) => {
+                      e.currentTarget.style.outline = 'none';
+                      e.currentTarget.style.borderColor = '#bfdbfe';
+                    }}
+                    onMouseOver={(e) => e.currentTarget.style.boxShadow = '0 8px 15px rgba(0,0,0,0.1)'}
+                    onMouseOut={(e) => e.currentTarget.style.boxShadow = '0 4px 6px rgba(0,0,0,0.05)'}
                   />
                 </div>
-                {/* Boutons */}
-                <div className="flex space-x-4 pt-4">
+                <div style={{ paddingTop: '1rem' }}>
                   <button
                     type="submit"
+                    onClick={handleSubmit}
                     disabled={!isFormValid() || isSubmitting}
-                    className={`flex-1 flex items-center justify-center px-8 py-3 rounded-2xl font-bold shadow-xl transition-all duration-200 text-lg tracking-wide focus:outline-none focus:ring-2 focus:ring-pink-400 focus:ring-offset-2
-                      ${isFormValid() && !isSubmitting
-                        ? 'bg-gradient-to-r from-pink-500 via-red-500 to-yellow-400 hover:from-pink-600 hover:to-yellow-500 text-white hover:shadow-2xl transform hover:-translate-y-0.5 scale-105'
-                        : 'bg-gray-200 text-gray-400 cursor-not-allowed'}`}
+                    style={{
+                      ...styles.submitButton,
+                      ...(isFormValid() && !isSubmitting ? styles.submitButtonActive : styles.submitButtonDisabled)
+                    }}
+                    onMouseOver={(e) => {
+                      if (isFormValid() && !isSubmitting) {
+                        e.currentTarget.style.background = 'linear-gradient(90deg, #db2777, #dc2626, #ea580c)';
+                        e.currentTarget.style.transform = 'translateY(-2px) scale(1.02)';
+                        e.currentTarget.style.boxShadow = '0 15px 35px rgba(0,0,0,0.3)';
+                      }
+                    }}
+                    onMouseOut={(e) => {
+                      if (isFormValid() && !isSubmitting) {
+                        e.currentTarget.style.background = 'linear-gradient(90deg, #ec4899, #ef4444, #f59e0b)';
+                        e.currentTarget.style.transform = 'translateY(0) scale(1)';
+                        e.currentTarget.style.boxShadow = '0 10px 25px rgba(0,0,0,0.2)';
+                      }
+                    }}
                   >
                     {isSubmitting ? (
                       <>
-                        <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
+                        <div style={styles.spinner}></div>
                         Envoi en cours...
                       </>
                     ) : (
                       <>
-                        <Send className="mr-2" size={24} />
+                        <Send style={{ marginRight: '0.5rem' }} size={24} />
                         Envoyer le signalement
                       </>
                     )}
                   </button>
                 </div>
-              </form>
+              </div>
               {/* Message de succès */}
               {success && (
-                <div className="absolute top-0 left-0 w-full h-full flex items-center justify-center bg-gradient-to-br from-green-200/80 via-green-100/80 to-green-50/80 border border-green-300 rounded-3xl p-6 shadow-2xl backdrop-blur-xl animate-fade-in z-20">
-                  <div className="flex items-start space-x-4">
-                    <CheckCircle className="text-green-600 mt-0.5" size={32} />
+                <div style={styles.successOverlay} className="animate-fade-in">
+                  <div style={styles.successContent}>
+                    <CheckCircle style={{ color: '#16a34a', marginTop: '0.125rem' }} size={32} />
                     <div>
-                      <h3 className="font-semibold text-green-900 mb-1 text-xl">✅ Signalement envoyé avec succès !</h3>
-                      <p className="text-green-800 text-base">Le responsable de maintenance a été notifié et traitera votre demande dans les plus brefs délais.</p>
+                      <h3 style={styles.successTitle}>✅ Signalement envoyé avec succès !</h3>
+                      <p style={styles.successText}>Le responsable de maintenance a été notifié et traitera votre demande dans les plus brefs délais.</p>
                     </div>
                   </div>
                 </div>
               )}
             </div>
           </div>
+          
           {/* Panneau latéral */}
-          <div className="space-y-10">
+          <div style={styles.sidebar}>
             {/* Informations utilisateur */}
-            <div className="bg-gradient-to-br from-blue-100/80 via-white/80 to-indigo-100/80 rounded-3xl shadow-xl p-8 border border-blue-100 backdrop-blur-md">
-              <h3 className="text-lg font-bold mb-4 flex items-center text-blue-800">
-                <User className="mr-2 text-blue-500" size={24} />
+            <div style={{ ...styles.sidebarCard, ...styles.userCard }}>
+              <h3 style={{ ...styles.cardTitle, color: '#1e40af' }}>
+                <User style={{ color: '#3b82f6' }} size={24} />
                 Votre statut
               </h3>
-              <div className="space-y-3 text-base">
-                <div className="flex items-center justify-between">
-                  <span className="text-blue-700">Conducteur :</span>
-                  <span className="font-bold text-indigo-900">Ahmed Alami</span>
+              <div style={styles.userInfo}>
+                <div style={styles.userInfoRow}>
+                  <span style={{ color: '#1e40af' }}>Conducteur :</span>
+                  <span style={{ fontWeight: '700', color: '#312e81' }}>Ahmed Alami</span>
                 </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-blue-700">Shift :</span>
-                  <span className="font-bold text-indigo-900">Matin (06:00-14:00)</span>
+                <div style={styles.userInfoRow}>
+                  <span style={{ color: '#1e40af' }}>Shift :</span>
+                  <span style={{ fontWeight: '700', color: '#312e81' }}>Matin (06:00-14:00)</span>
                 </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-blue-700">Zone :</span>
-                  <span className="font-bold text-indigo-900">Portiques P5-P9</span>
+                <div style={styles.userInfoRow}>
+                  <span style={{ color: '#1e40af' }}>Zone :</span>
+                  <span style={{ fontWeight: '700', color: '#312e81' }}>Portiques P5-P9</span>
                 </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-blue-700">Statut :</span>
-                  <span className="flex items-center text-green-700 font-bold">
-                    <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
+                <div style={styles.userInfoRow}>
+                  <span style={{ color: '#1e40af' }}>Statut :</span>
+                  <span style={{ display: 'flex', alignItems: 'center', color: '#059669', fontWeight: '700' }}>
+                    <div style={{ width: '8px', height: '8px', backgroundColor: '#10b981', borderRadius: '50%', marginRight: '0.5rem' }}></div>
                     Actif
                   </span>
                 </div>
               </div>
             </div>
+            
             {/* Instructions */}
-            <div className="bg-gradient-to-br from-indigo-50/80 via-blue-100/80 to-pink-100/80 rounded-3xl p-8 border border-blue-100 shadow-lg backdrop-blur-md">
-              <h3 className="text-lg font-bold mb-4 text-pink-700 flex items-center">
-                <Info className="mr-2" size={24} />
+            <div style={{ ...styles.sidebarCard, ...styles.instructionsCard }}>
+              <h3 style={{ ...styles.cardTitle, color: '#be185d' }}>
+                <Info style={{ color: '#ec4899' }} size={24} />
                 Instructions importantes
               </h3>
-              <div className="space-y-3 text-base text-blue-900">
-                <div className="flex items-start space-x-2">
-                  <div className="w-6 h-6 bg-pink-500 text-white rounded-full flex items-center justify-center text-xs font-bold mt-0.5">1</div>
+              <div style={styles.instructions}>
+                <div style={styles.instructionItem}>
+                  <div style={styles.instructionNumber}>1</div>
                   <div><strong>Sécurité d'abord :</strong> En cas d'urgence critique, arrêtez immédiatement l'opération</div>
                 </div>
-                <div className="flex items-start space-x-2">
-                  <div className="w-6 h-6 bg-pink-500 text-white rounded-full flex items-center justify-center text-xs font-bold mt-0.5">2</div>
+                <div style={styles.instructionItem}>
+                  <div style={styles.instructionNumber}>2</div>
                   <div><strong>Description précise :</strong> Plus vous donnez de détails, plus l'intervention sera efficace</div>
                 </div>
-                <div className="flex items-start space-x-2">
-                  <div className="w-6 h-6 bg-pink-500 text-white rounded-full flex items-center justify-center text-xs font-bold mt-0.5">3</div>
+                <div style={styles.instructionItem}>
+                  <div style={styles.instructionNumber}>3</div>
                   <div><strong>Suivi en temps réel :</strong> Vous serez notifié des actions entreprises</div>
                 </div>
               </div>
             </div>
+            
             {/* Contacts d'urgence */}
-            <div className="bg-gradient-to-br from-pink-100/80 via-red-100/80 to-orange-100/80 border border-pink-200 rounded-3xl p-8 shadow-lg backdrop-blur-md">
-              <h3 className="text-lg font-bold mb-4 text-pink-900 flex items-center">
-                <Phone className="mr-2" size={24} />
+            <div style={{ ...styles.sidebarCard, ...styles.contactsCard }}>
+              <h3 style={{ ...styles.cardTitle, color: '#be185d' }}>
+                <Phone style={{ color: '#ec4899' }} size={24} />
                 Contacts d'urgence
               </h3>
-              <div className="space-y-2 text-base">
-                <div className="flex justify-between">
-                  <span className="font-bold text-pink-800">Sécurité :</span>
-                  <span className="text-pink-700">15</span>
+              <div style={styles.contacts}>
+                <div style={styles.contactRow}>
+                  <span style={{ fontWeight: '700', color: '#be185d' }}>Sécurité :</span>
+                  <span style={{ color: '#be185d' }}>15</span>
                 </div>
-                <div className="flex justify-between">
-                  <span className="font-bold text-pink-800">Maintenance :</span>
-                  <span className="text-pink-700">+212 5 22 XX XX XX</span>
+                <div style={styles.contactRow}>
+                  <span style={{ fontWeight: '700', color: '#be185d' }}>Maintenance :</span>
+                  <span style={{ color: '#be185d' }}>+212 5 22 XX XX XX</span>
                 </div>
-                <div className="flex justify-between">
-                  <span className="font-bold text-pink-800">Responsable :</span>
-                  <span className="text-pink-700">+212 6 XX XX XX XX</span>
+                <div style={styles.contactRow}>
+                  <span style={{ fontWeight: '700', color: '#be185d' }}>Responsable :</span>
+                  <span style={{ color: '#be185d' }}>+212 6 XX XX XX XX</span>
                 </div>
               </div>
             </div>
+            
             {/* Historique */}
             {showHistory && (
-              <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-xl p-8 border border-blue-100 animate-fade-in">
-                <h3 className="text-lg font-bold mb-4 flex items-center text-indigo-700">
-                  <Clock className="mr-2 text-pink-500" size={24} />
+              <div style={{ ...styles.sidebarCard, ...styles.historyCard }} className="animate-fade-in">
+                <h3 style={{ ...styles.cardTitle, color: '#5b21b6' }}>
+                  <Clock style={{ color: '#ec4899' }} size={24} />
                   Historique récent
                 </h3>
-                <div className="space-y-3 max-h-64 overflow-y-auto">
+                <div style={styles.historyList}>
                   {history.length === 0 ? (
-                    <p className="text-blue-400 text-base">Aucun signalement récent</p>
+                    <p style={{ color: '#93c5fd', fontSize: '1rem' }}>Aucun signalement récent</p>
                   ) : (
                     history.slice(0, 5).map((item) => (
-                      <div key={item.id} className="border border-pink-100 rounded-xl p-4 bg-gradient-to-r from-blue-50/80 via-white/80 to-pink-50/80 hover:bg-pink-50/80 transition-colors duration-200 shadow-md">
-                        <div className="flex items-center justify-between mb-1">
-                          <span className="font-bold text-base text-indigo-900">{item.title}</span>
-                          <span className={`px-3 py-1 rounded-xl text-xs font-extrabold uppercase tracking-wide shadow-md
-                            ${item.statut === 'en attente' ? 'bg-yellow-200 text-yellow-900' :
-                              item.statut === 'en cours' ? 'bg-blue-200 text-blue-900' :
-                              'bg-green-200 text-green-900'}`}
-                          >
+                      <div 
+                        key={item.id} 
+                        style={styles.historyItem}
+                        onMouseOver={(e) => e.currentTarget.style.backgroundColor = 'rgba(252,231,243,0.8)'}
+                        onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'linear-gradient(90deg, rgba(239,246,255,0.8), rgba(255,255,255,0.8), rgba(252,231,243,0.8))'}
+                      >
+                        <div style={styles.historyHeader}>
+                          <span style={styles.historyTitle}>{item.title}</span>
+                          <span style={{
+                            ...styles.historyStatus,
+                            ...getStatusStyle(item.statut)
+                          }}>
                             {item.statut}
                           </span>
                         </div>
-                        <p className="text-xs text-blue-400">{new Date(item.date_debut).toLocaleDateString('fr-FR')}</p>
+                        <p style={styles.historyDate}>{new Date(item.date_debut).toLocaleDateString('fr-FR')}</p>
                       </div>
                     ))
                   )}
@@ -426,11 +935,12 @@ const ConducteurAnomalies = () => {
             )}
           </div>
         </div>
+        
         {/* Footer */}
-        <div className="mt-16 w-full flex justify-center">
-          <div className="bg-gradient-to-r from-blue-100/80 via-white/80 to-pink-100/80 rounded-2xl shadow-lg p-6 border border-blue-100 max-w-2xl w-full text-center backdrop-blur-md">
-            <p className="text-indigo-700 text-lg font-bold">🏗️ Port de Casablanca - Système de Maintenance Intégré v2.0</p>
-            <p className="text-pink-500 text-sm mt-1">Pour toute assistance technique, contactez le support : <span className="underline">support@port-casa.ma</span></p>
+        <div style={styles.footer}>
+          <div style={styles.footerCard}>
+            <p style={styles.footerTitle}>🏗️ Port de Casablanca - Système de Maintenance Intégré v2.0</p>
+            <p style={styles.footerSubtitle}>Pour toute assistance technique, contactez le support : <span style={{ textDecoration: 'underline' }}>support@port-casa.ma</span></p>
           </div>
         </div>
       </main>
