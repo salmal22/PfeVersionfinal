@@ -27,7 +27,9 @@ import {
   Save,
   Eye,
   Download,
-  Upload
+  Upload,
+  Check,
+  ChevronDown
 } from 'lucide-react';
 
 // Service de données pour technicien
@@ -61,7 +63,15 @@ class TechnicienDataService {
 
   getMesInterventions() {
     const interventions = this.getData(this.INTERVENTIONS_KEY) || [];
-    return interventions.filter(inter => inter.technicianId === this.TECHNICIEN_ID);
+    return interventions.filter(inter => inter.technicianId === this.TECHNICIEN_ID)
+      .map(inter => {
+        // S'assurer que les interventions nouvellement assignées ont le bon statut
+        if (!inter.acceptedTime && !inter.startTime && 
+            (inter.status === 'en_cours' || !inter.status || inter.status === 'assignee')) {
+          return { ...inter, status: 'assignee', statut: 'assignee' };
+        }
+        return inter;
+      });
   }
 
   getInterventionsAvecDetails() {
@@ -100,6 +110,19 @@ class TechnicienDataService {
       return interventions[index];
     }
     return null;
+  }
+
+  // Nouvelle fonction pour accepter une intervention
+  acceptIntervention(interventionId) {
+    const updates = {
+      status: 'acceptee',
+      statut: 'acceptee',
+      acceptedTime: new Date().toISOString()
+    };
+    
+    const result = this.updateIntervention(interventionId, updates);
+    this.addNote(interventionId, 'Intervention acceptée par le technicien', 'system');
+    return result;
   }
 
   startIntervention(interventionId) {
@@ -232,6 +255,7 @@ class TechnicienDataService {
       totalInterventions: interventions.length,
       interventionsEnCours: interventions.filter(i => i.status === 'en_cours').length,
       interventionsEnAttente: interventions.filter(i => i.status === 'assignee').length,
+      interventionsAcceptees: interventions.filter(i => i.status === 'acceptee').length,
       interventionsTerminees: interventions.filter(i => i.status === 'terminee').length,
       interventionsAujourdhui: interventions.filter(i => 
         new Date(i.date).toDateString() === today
@@ -262,6 +286,20 @@ class TechnicienDataService {
     const total = this.calculateTotalTime(completed);
     return Math.round(total / completed.length);
   }
+
+  // Fonction pour réinitialiser une intervention (utile pour les tests)
+  resetIntervention(interventionId) {
+    const updates = {
+      status: 'assignee',
+      statut: 'assignee',
+      acceptedTime: null,
+      startTime: null,
+      endTime: null,
+      pauseTime: null
+    };
+    
+    return this.updateIntervention(interventionId, updates);
+  }
 }
 
 const technicienService = new TechnicienDataService();
@@ -283,6 +321,7 @@ const TechnicienDashboard = () => {
   const [selectedIntervention, setSelectedIntervention] = useState(null);
   
   const [notifications, setNotifications] = useState([]);
+  const [showNotifications, setShowNotifications] = useState(false);
   const [snackbar, setSnackbar] = useState({ open: false, message: '', type: 'info' });
 
   useEffect(() => {
@@ -317,7 +356,8 @@ const TechnicienDashboard = () => {
           id: inter.id,
           message: `Nouvelle intervention assignée: ${inter.description}`,
           time: new Date().toLocaleTimeString('fr-FR'),
-          type: 'assignment'
+          type: 'assignment',
+          interventionId: inter.id
         }))
       ]);
     }
@@ -326,6 +366,16 @@ const TechnicienDashboard = () => {
   const showSnackbar = (message, type = 'info') => {
     setSnackbar({ open: true, message, type });
     setTimeout(() => setSnackbar({ open: false, message: '', type: 'info' }), 3000);
+  };
+
+  const handleAcceptIntervention = (interventionId) => {
+    try {
+      technicienService.acceptIntervention(interventionId);
+      loadData();
+      showSnackbar('Intervention acceptée', 'success');
+    } catch (error) {
+      showSnackbar('Erreur lors de l\'acceptation', 'error');
+    }
   };
 
   const handleStartIntervention = (interventionId) => {
@@ -359,6 +409,34 @@ const TechnicienDashboard = () => {
     }
   };
 
+  const handleResetIntervention = (interventionId) => {
+    try {
+      technicienService.resetIntervention(interventionId);
+      loadData();
+      showSnackbar('Intervention réinitialisée', 'info');
+    } catch (error) {
+      showSnackbar('Erreur lors de la réinitialisation', 'error');
+    }
+  };
+
+  const handleNotificationClick = (notification) => {
+    if (notification.interventionId) {
+      const intervention = interventions.find(i => i.id === notification.interventionId);
+      if (intervention) {
+        setSelectedIntervention(intervention);
+        setShowInterventionModal(true);
+      }
+    }
+    // Marquer la notification comme lue
+    setNotifications(prev => prev.filter(n => n.id !== notification.id));
+    setShowNotifications(false);
+  };
+
+  const clearAllNotifications = () => {
+    setNotifications([]);
+    setShowNotifications(false);
+  };
+
   const getFilteredInterventions = () => {
     return interventions.filter(inter => {
       const statusMatch = statusFilter === 'all' || inter.status === statusFilter;
@@ -373,11 +451,23 @@ const TechnicienDashboard = () => {
   const getStatusColor = (status) => {
     const colors = {
       'assignee': '#dbeafe',
+      'acceptee': '#fef3c7',
       'en_cours': '#dcfce7',
       'en_pause': '#fef3c7',
       'terminee': '#f3f4f6'
     };
     return colors[status] || '#f3f4f6';
+  };
+
+  const getStatusLabel = (status) => {
+    const labels = {
+      'assignee': 'Assignée',
+      'acceptee': 'Acceptée',
+      'en_cours': 'En cours',
+      'en_pause': 'En pause',
+      'terminee': 'Terminée'
+    };
+    return labels[status] || status;
   };
 
   const getPriorityColor = (priority) => {
@@ -491,6 +581,10 @@ const TechnicienDashboard = () => {
       backgroundColor: '#f59e0b',
       color: 'white'
     },
+    buttonAccept: {
+      backgroundColor: '#059669',
+      color: 'white'
+    },
     buttonSecondary: {
       backgroundColor: '#f3f4f6',
       color: '#374151',
@@ -540,6 +634,19 @@ const TechnicienDashboard = () => {
       borderRadius: '0.5rem',
       fontSize: '0.875rem',
       resize: 'vertical'
+    },
+    notificationDropdown: {
+      position: 'absolute',
+      top: '100%',
+      right: 0,
+      backgroundColor: 'white',
+      borderRadius: '0.5rem',
+      boxShadow: '0 10px 25px rgba(0,0,0,0.1)',
+      border: '1px solid #e5e7eb',
+      width: '320px',
+      maxHeight: '400px',
+      overflow: 'auto',
+      zIndex: 1000
     }
   };
 
@@ -567,6 +674,69 @@ const TechnicienDashboard = () => {
     }}>
       {children}
     </span>
+  );
+
+  // Composant pour les notifications
+  const NotificationDropdown = () => (
+    <div style={styles.notificationDropdown}>
+      <div style={{ padding: '1rem', borderBottom: '1px solid #e5e7eb' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <h3 style={{ fontSize: '1rem', fontWeight: '600', margin: 0 }}>
+            Notifications ({notifications.length})
+          </h3>
+          {notifications.length > 0 && (
+            <button
+              onClick={clearAllNotifications}
+              style={{ ...styles.button, ...styles.buttonSecondary, padding: '0.25rem 0.5rem', fontSize: '0.75rem' }}
+            >
+              Tout effacer
+            </button>
+          )}
+        </div>
+      </div>
+      
+      <div style={{ maxHeight: '300px', overflow: 'auto' }}>
+        {notifications.length === 0 ? (
+          <div style={{ padding: '2rem', textAlign: 'center', color: '#6b7280' }}>
+            <Bell size={32} style={{ margin: '0 auto 0.5rem', opacity: 0.5 }} />
+            <p>Aucune notification</p>
+          </div>
+        ) : (
+          notifications.map((notification) => (
+            <div
+              key={notification.id}
+              onClick={() => handleNotificationClick(notification)}
+              style={{
+                padding: '0.75rem 1rem',
+                borderBottom: '1px solid #f3f4f6',
+                cursor: 'pointer',
+                transition: 'background-color 0.2s'
+              }}
+              onMouseEnter={(e) => e.target.style.backgroundColor = '#f9fafb'}
+              onMouseLeave={(e) => e.target.style.backgroundColor = 'white'}
+            >
+              <div style={{ display: 'flex', alignItems: 'start', gap: '0.5rem' }}>
+                <div style={{
+                  width: '8px',
+                  height: '8px',
+                  backgroundColor: notification.type === 'assignment' ? '#3b82f6' : '#10b981',
+                  borderRadius: '50%',
+                  marginTop: '0.5rem'
+                }}></div>
+                <div style={{ flex: 1 }}>
+                  <p style={{ margin: 0, fontSize: '0.875rem', lineHeight: '1.4' }}>
+                    {notification.message}
+                  </p>
+                  <p style={{ margin: 0, fontSize: '0.75rem', color: '#6b7280', marginTop: '0.25rem' }}>
+                    {notification.time}
+                  </p>
+                </div>
+              </div>
+            </div>
+          ))
+        )}
+      </div>
+    </div>
   );
 
   // Modal pour les détails d'intervention
@@ -600,7 +770,7 @@ const TechnicienDashboard = () => {
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                     <strong>Statut:</strong>
                     <Badge color={selectedIntervention.status === 'en_cours' ? '#10b981' : '#6b7280'}>
-                      {selectedIntervention.status}
+                      {getStatusLabel(selectedIntervention.status)}
                     </Badge>
                   </div>
                   <div><strong>Durée estimée:</strong> {formatDuration(selectedIntervention.estimatedDuration)}</div>
@@ -617,6 +787,16 @@ const TechnicienDashboard = () => {
 
               <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
                 {selectedIntervention.status === 'assignee' && (
+                  <button
+                    onClick={() => handleAcceptIntervention(selectedIntervention.id)}
+                    style={{ ...styles.button, ...styles.buttonAccept }}
+                  >
+                    <Check size={16} />
+                    Accepter
+                  </button>
+                )}
+
+                {selectedIntervention.status === 'acceptee' && (
                   <button
                     onClick={() => handleStartIntervention(selectedIntervention.id)}
                     style={{ ...styles.button, ...styles.buttonSuccess }}
@@ -828,8 +1008,15 @@ const TechnicienDashboard = () => {
           icon={Clock}
           title="En attente"
           value={stats.interventionsEnAttente || 0}
-          subtitle="À traiter"
+          subtitle="À accepter"
           color="#3b82f6"
+        />
+        <StatCard
+          icon={Check}
+          title="Acceptées"
+          value={stats.interventionsAcceptees || 0}
+          subtitle="Prêtes à démarrer"
+          color="#f59e0b"
         />
         <StatCard
           icon={CheckCircle}
@@ -837,13 +1024,6 @@ const TechnicienDashboard = () => {
           value={stats.interventionsTerminees || 0}
           subtitle="Complétées"
           color="#6b7280"
-        />
-        <StatCard
-          icon={Calendar}
-          title="Aujourd'hui"
-          value={stats.interventionsAujourdhui || 0}
-          subtitle="Interventions du jour"
-          color="#8b5cf6"
         />
       </div>
 
@@ -870,6 +1050,7 @@ const TechnicienDashboard = () => {
             >
               <option value="all">Tous les statuts</option>
               <option value="assignee">Assignées</option>
+              <option value="acceptee">Acceptées</option>
               <option value="en_cours">En cours</option>
               <option value="en_pause">En pause</option>
               <option value="terminee">Terminées</option>
@@ -891,9 +1072,18 @@ const TechnicienDashboard = () => {
                   <Badge color={getPriorityColor(inter.urgence)}>
                     {inter.urgence}
                   </Badge>
-                  <Badge color={inter.status === 'en_cours' ? '#10b981' : '#6b7280'}>
-                    {inter.status}
+                  <Badge color={
+                    inter.status === 'en_cours' ? '#10b981' :
+                    inter.status === 'acceptee' ? '#f59e0b' :
+                    inter.status === 'assignee' ? '#3b82f6' :
+                    '#6b7280'
+                  }>
+                    {getStatusLabel(inter.status)}
                   </Badge>
+                  {/* Debug - afficher le statut brut */}
+                  <span style={{ fontSize: '0.75rem', color: '#ef4444', backgroundColor: '#fee2e2', padding: '0.25rem', borderRadius: '0.25rem' }}>
+                    DEBUG: {inter.status} | {inter.statut || 'no statut'}
+                  </span>
                 </div>
                 
                 <p style={{ color: '#6b7280', marginBottom: '0.5rem' }}>{inter.description}</p>
@@ -917,7 +1107,26 @@ const TechnicienDashboard = () => {
               </div>
 
               <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                {/* Bouton de debug temporaire */}
+                <button
+                  onClick={() => handleResetIntervention(inter.id)}
+                  style={{ ...styles.button, backgroundColor: '#ef4444', color: 'white', fontSize: '0.75rem', padding: '0.25rem 0.5rem' }}
+                  title="Réinitialiser (debug)"
+                >
+                  Reset
+                </button>
+
                 {inter.status === 'assignee' && (
+                  <button
+                    onClick={() => handleAcceptIntervention(inter.id)}
+                    style={{ ...styles.button, ...styles.buttonAccept }}
+                  >
+                    <Check size={16} />
+                    Accepter
+                  </button>
+                )}
+
+                {inter.status === 'acceptee' && (
                   <button
                     onClick={() => handleStartIntervention(inter.id)}
                     style={{ ...styles.button, ...styles.buttonSuccess }}
@@ -1142,7 +1351,10 @@ const TechnicienDashboard = () => {
             </button>
             
             <div style={{ position: 'relative' }}>
-              <button style={{ ...styles.button, ...styles.buttonSecondary, position: 'relative' }}>
+              <button 
+                onClick={() => setShowNotifications(!showNotifications)}
+                style={{ ...styles.button, ...styles.buttonSecondary, position: 'relative' }}
+              >
                 <Bell size={20} />
                 {notifications.length > 0 && (
                   <span style={{
@@ -1163,6 +1375,8 @@ const TechnicienDashboard = () => {
                   </span>
                 )}
               </button>
+              
+              {showNotifications && <NotificationDropdown />}
             </div>
             
             {profil && (
@@ -1221,6 +1435,14 @@ const TechnicienDashboard = () => {
       {showInterventionModal && <InterventionDetailModal />}
       {showNoteModal && <NoteModal />}
       {showCompletionModal && <CompletionModal />}
+
+      {/* Click outside to close notifications */}
+      {showNotifications && (
+        <div 
+          style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 999 }}
+          onClick={() => setShowNotifications(false)}
+        />
+      )}
 
       {/* Snackbar */}
       {snackbar.open && (
